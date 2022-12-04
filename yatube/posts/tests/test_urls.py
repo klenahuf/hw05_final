@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.core.cache import cache
+
 
 from http import HTTPStatus
 from posts.models import Post, Group
@@ -50,6 +52,7 @@ class PostURLTests(TestCase):
         self.authorized_client.force_login(PostURLTests.user)
         self.author_client = Client()
         self.author_client.force_login(PostURLTests.author_user)
+        cache.clear()
 
     def test_urls_status(self):
         address_status_client = [

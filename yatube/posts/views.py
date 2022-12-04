@@ -1,12 +1,13 @@
-
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import cache_page
 
 from .forms import PostForm, CommentForm
 from .models import Group, Post, User, Follow
 from .utils import get_paginator_helper
 
 
+@cache_page(20, cache='default', key_prefix='index_page')
 def index(request):
     post_list = Post.objects.all()
     page_obj = get_paginator_helper(request, post_list)

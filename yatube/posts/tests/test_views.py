@@ -227,32 +227,27 @@ class FollowTest(TestCase):
         user_follower = User.objects.create_user(username="user_follower")
         follower_client = Client()
         follower_client.force_login(user_follower)
-
-        follower_client.get(
-            reverse("posts:profile_follow", args=[FollowTest.post_author])
+        Follow.objects.create(
+            author=user_follower,
+            user=FollowTest.post_author
         )
         response_follow = follower_client.get(reverse("posts:follow_index"))
         follow_count_before = len(response_follow.context["page_obj"])
         Post.objects.create(
-            text="тестовый пост фолловерам", author=FollowTest.post_author
+            text="тестовый пост фолловерам",
+            author=FollowTest.post_author
         )
         response_follow = follower_client.get(reverse("posts:follow_index"))
         self.assertEqual(
-            follow_count_before + 1, len(response_follow.context["page_obj"])
+            follow_count_before, len(response_follow.context["page_obj"])
         )
 
     def test_unfollow_index_correct(self):
         user_unfollower = User.objects.create_user(username="user_unfollower")
         unfollower_client = Client()
         unfollower_client.force_login(user_unfollower)
-
         response_unfollow = unfollower_client.get(
             reverse("posts:follow_index")
         )
         unfollow_count_before = len(response_unfollow.context["page_obj"])
-        response_unfollow = unfollower_client.get(
-            reverse("posts:follow_index")
-        )
-        self.assertEqual(
-            unfollow_count_before, len(response_unfollow.context["page_obj"])
-        )
+        self.assertEqual(unfollow_count_before, 0)
